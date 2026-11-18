@@ -1,0 +1,19 @@
+Moonaan patch of picomatch 4.0.7 for CVE-2026-112366 / GHSA-fc5q-39xc-vjpf.
+
+picomatch is Copyright (c) 2017-present, Jon Schlinkert, released under the
+MIT License (see LICENSE). This fork is unchanged from upstream tag 4.0.7 except:
+
+- lib/parse.js + test/options.maxExtglobRecursion.js: upstream PR
+  micromatch/picomatch#237 by Eduardo Seibt (head 1bf0d04563cb9ce568cf36efc5f6b7187d9911d5),
+  which collapses single-branch repeated extglobs that contain a star
+  (`+(P)` -> `(P)`, `*(P)` -> `(P)?`) so they no longer nest unbounded quantifiers.
+- test/moonaan.cve-2026-112366.js: timing regression test.
+
+Upstream PR #194 (named in the advisory) was evaluated and NOT used: it does not
+bound `+(*)` / `+(*a)`.
+
+Known residual (not covered by this patch or by any upstream PR evaluated):
+multi-branch repeated extglobs with a starred branch, e.g. `+(*a|*b)` or
+`*(*.js|*.ts)`, still backtrack exponentially.
+
+Delete this fork once upstream releases a fixed version.
