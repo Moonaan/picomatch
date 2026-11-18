@@ -2,9 +2,10 @@
 > upstream PR [#237](https://github.com/micromatch/picomatch/pull/237) for
 > CVE-2026-112366 / GHSA-fc5q-39xc-vjpf (ReDoS via single-branch repeated extglobs
 > such as `+(*)` / `+(*a)`). Delete this fork once upstream releases a fix.
-> Still exponential: multi-alternative bodies such as `+(*a|*b)` and `*(*.js|*.ts)`.
-> Behaviour change: a bracket that can match `/` inside a collapsed branch
-> (`+(*[/])`, `+(*[[:punct:]])`) no longer matches multi-segment subjects like `x//`.
+> A Moonaan guard skips the collapse where it would change match results
+> (generated differential vs 4.0.7: 0 mismatches in 202M checks).
+> Still exponential, as in 4.0.7: multi-alternative bodies such as `+(*a|*b)` and
+> `*(*.js|*.ts)`, and bodies with a bracket that can match `/` such as `+(*[[:punct:]])`.
 > See [NOTICE](NOTICE). Original license (MIT) and attribution below are unchanged.
 
 <h1 align="center">Picomatch</h1>
