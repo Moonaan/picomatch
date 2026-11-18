@@ -12,8 +12,12 @@ MIT License (see LICENSE). This fork is unchanged from upstream tag 4.0.7 except
 Upstream PR #194 (named in the advisory) was evaluated and NOT used: it does not
 bound `+(*)` / `+(*a)`.
 
-Known residual (not covered by this patch or by any upstream PR evaluated):
-multi-branch repeated extglobs with a starred branch, e.g. `+(*a|*b)` or
-`*(*.js|*.ts)`, still backtrack exponentially.
+Known residuals of this patch:
+- Multi-branch repeated extglobs with a starred branch, e.g. `+(*a|*b)`,
+  `+(*a|b)` or `*(*.js|*.ts)`, still backtrack exponentially (upstream #259
+  closes these but literalizes slash-containing bodies such as `+(**/a)`).
+- A bracket class that can match `/` inside the collapsed branch, e.g.
+  `+(*[/])` or `+(*[[:punct:]])`, no longer matches multi-segment subjects
+  such as `x//` (4.0.7 did).
 
 Delete this fork once upstream releases a fixed version.
