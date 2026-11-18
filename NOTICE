@@ -1,0 +1,35 @@
+@moonaan/picomatch 4.0.8-moonaan.1
+Moonaan patch of picomatch 4.0.7 for CVE-2026-112366 / GHSA-fc5q-39xc-vjpf.
+Delete this fork once upstream releases a fixed version.
+
+picomatch is Copyright (c) 2017-present, Jon Schlinkert, released under the
+MIT License (see LICENSE). This package is unchanged from upstream tag 4.0.7
+except:
+
+- lib/parse.js + test/options.maxExtglobRecursion.js: upstream PR
+  micromatch/picomatch#237 by Eduardo Seibt (head 1bf0d04563cb9ce568cf36efc5f6b7187d9911d5),
+  which collapses single-branch repeated extglobs that contain a star
+  (`+(P)` -> `(P)`, `*(P)` -> `(P)?`) so they no longer nest unbounded quantifiers.
+- lib/parse.js (Moonaan): the collapse is skipped, keeping 4.0.7's output,
+  when the branch has an escaped `/`, a `"` quote, a bracket that can match
+  `/` (a literal `/`, [:punct:]/[:graph:]/[:print:]/[:ascii:], or a range
+  spanning `/`), or when `regex: true`. Without this, #237 changed match
+  results for e.g. `+(*\/)`, `+("*")`, `+([ab]*c)` with regex:true and
+  `+(*[/])`. A generated differential against 4.0.7 (14,440 patterns x 2,801
+  subjects x 5 option sets, 202M checks) shows 0 mismatches.
+- test/moonaan.cve-2026-112366.js: timing regression test and the
+  match-preservation cases above.
+- package.json: renamed to @moonaan/picomatch, version 4.0.8-moonaan.1,
+  published to GitHub Packages. The version sorts above 4.0.7 (so it is outside
+  the advisory's `<= 4.0.7` range) and below a real 4.0.8.
+
+Upstream PR #194 (named in the advisory) was evaluated and NOT used: it does not
+bound `+(*)` / `+(*a)`.
+
+Known residuals of this patch (all unchanged from 4.0.7, which is also
+exponential on them). Do not compile untrusted glob patterns:
+- Multi-alternative repeated extglobs with a starred branch, e.g. `+(*a|*b)`,
+  `+(*a|b)` or `*(*.js|*.ts)`.
+- Single-branch bodies the collapse deliberately skips because collapsing would
+  change results: a bracket that can match `/` other than a bare `[/]`, e.g.
+  `+(*[[:punct:]])` or `+(*[.-0])`.
